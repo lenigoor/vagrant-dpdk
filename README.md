@@ -10,6 +10,7 @@ At the time of writing, Vagrant was installed by running
 ```
 wget https://releases.hashicorp.com/vagrant/2.0.1/vagrant_2.0.1_x86_64.deb
 sudo dpkg -i vagrant_2.0.1_x86_64.deb
+vagrant plugin install vagrant-triggers
 ```
 
 Now to install VirtualBox run
@@ -36,6 +37,3 @@ sudo ./capture
 ```
 
 This will listen for incoming packets on the second virtual network adapter. This interface is available at the host system using the name `vboxnet0` (assuming there were no host-only adapters installed before). Packets can be injected by downloading a packet capture and using `tcpreplay` on the host system, for example.
-
-**Note**: when rebooting the VM, the second virtual NIC gets unbind from DPDK. To bind it run `sudo ./bind-nic-to-dpdk` from the sample application directory. The capture application will also suggest this when it cannot not find the DPDK device.
-

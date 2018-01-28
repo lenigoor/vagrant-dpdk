@@ -46,15 +46,11 @@ make -C ${HOME}/packet-reader
 
 # Load kernel modules
 sudo modprobe uio
-sudo insmod build/kmod/igb_uio.ko
+sudo insmod ${RTE_SDK}/build/kmod/igb_uio.ko
 
 # Allocate 512 hugepages of 2 MB
 # Change can be validated by executing 'cat /proc/meminfo | grep Huge'
 echo 512 | sudo tee /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages > /dev/null
-
-# Move control of second NIC to DPDK
-sudo ifconfig ${NET_IF_NAME} down
-sudo ${RTE_SDK}/usertools/dpdk-devbind.py --bind=igb_uio ${NET_IF_NAME}
 
 ###########################
 # Persistent Configuration
@@ -74,5 +70,6 @@ echo "vm.nr_hugepages = 512" | sudo tee -a /etc/sysctl.conf > /dev/null
 # Add environment variable to system settings
 echo "RTE_SDK=${RTE_SDK}" | sudo tee -a /etc/environment > /dev/null
 
+# Binding the secondary NIC to DPDK is done by the Vagrant after "vagrant up" is executed
 # Notify the user that configuration has completed
 echo "Configuration completed, use 'vagrant ssh' to access the virtual machine"

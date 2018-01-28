@@ -20,6 +20,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	# specific IP. This option is needed because DPDK takes over the NIC.
 	config.vm.network "private_network", ip: "10.0.0.10"
 
+	# Switch control of the secondary NIC to DPDK after "vagrant up" completed
+	config.trigger.after :up do
+		run_remote "$RTE_SDK/usertools/dpdk-devbind.py --force --bind=igb_uio enp0s8"
+	end
+
 	# VirtualBox-specific configuration
 	config.vm.provider "virtualbox" do |vb|
 		# Set machine name, memory and CPU limits
