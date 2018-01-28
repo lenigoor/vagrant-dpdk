@@ -7,4 +7,4 @@ capture: main.c
 
 .PHONY: clean
 clean:
-	rm -f $(obj) capture
+	rm -f capture
