@@ -107,6 +107,46 @@ struct rte_mempool *initialize_dpdk(int argc, char **argv, uint8_t port)
 }
 
 /*
+ * Display some basic information about the packet, like MAC and IP addresses.
+ */
+void process_packet(struct rte_mbuf *mbuf)
+{
+	u_char *p = rte_pktmbuf_mtod(mbuf, u_char*);
+	uint16_t length = rte_pktmbuf_data_len(mbuf);
+	printf("---------------------------\n");
+
+	// Process MAC layer
+	if (length < 14)
+		return;
+
+	printf("MAC src = %02x:%02x:%02x:%02x:%02x:%02x\n", p[6], p[7], p[8], p[9], p[10], p[11]);
+	printf("MAC dst = %02x:%02x:%02x:%02x:%02x:%02x\n", p[0], p[1], p[2], p[3], p[4], p[5]);
+
+	// Process IP layer, if any
+	if (length < 34 || p[12] != 0x08 || p[13] != 0x00)
+		return;
+
+	printf("IP src = %u.%u.%u.%u\n", p[26], p[27], p[28], p[29]);
+	printf("IP dst = %u.%u.%u.%u\n", p[30], p[31], p[32], p[33]);
+
+	// Get IP payload protocol
+	switch(p[23])
+	{
+		case 0x01:
+			printf("ICMP payload\n");
+			break;
+		case 0x06:
+			printf("TCP payload\n");
+			break;
+		case 0x11:
+			printf("UDP payload\n");
+			break;
+		default:
+			printf("Unknown payload\n");
+	}
+}
+
+/*
  * Initialize the DPDK framework and start polling for received packets.
  */
 int main(int argc, char **argv)
@@ -126,15 +166,15 @@ int main(int argc, char **argv)
 	// Main packet capture loop
 	while (continue_polling)
 	{
-		uint16_t nb_rx = rte_eth_rx_burst(port, 0, bufs, BURST_SIZE);
+		// Poll for a new burst of packets
+		uint16_t packet_count = rte_eth_rx_burst(port, 0, bufs, BURST_SIZE);
 
-		if (nb_rx)
+		for (uint buf = 0; buf < packet_count; buf++)
 		{
-			printf("Received %u packets\n", nb_rx);
+			process_packet(bufs[buf]);
 
 			// Free packet buffer after processing packet
-			for (uint buf = 0; buf < nb_rx; buf++)
-				rte_pktmbuf_free(bufs[buf]);
+			rte_pktmbuf_free(bufs[buf]);
 		}
 	}
 
