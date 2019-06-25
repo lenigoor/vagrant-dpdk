@@ -1,5 +1,5 @@
 # DPDK 18.11 - Ubuntu 16.04 - Vagrant configuration
-This project provides a Vagrant configuration for running DPDK 17.08.1 in an Ubuntu 16.04.3 LTS virtual machine. Also an additional test application is included for receiving packets using DPDK.
+This project provides a Vagrant configuration for running DPDK 18.11.2 in an Ubuntu 16.04.3 LTS virtual machine. Also an additional test application is included for receiving packets using DPDK.
 
 ## Prerequisites
 Tested using Vagrant 2.0.1 and VirtualBox 5.0.40 on my host operating system also running Ubuntu 16.04.
@@ -29,7 +29,7 @@ vagrant up
 This process will take a while to complete (~5 minutes). When finished, run `vagrant ssh` to enter the machine.
 
 ## VM structure
-The DPDK library is installed at `/home/vagrant/dpdk-stable-17.08.1` and the folder `packet-reader` from this repository is  mapped to `/home/vagrant/packet-reader`. To compile the sample application, navigate to this folder and run `make`.
+The DPDK library is installed at `/home/vagrant/dpdk-stable-18.11.2` and the folder `packet-reader` from this repository is  mapped to `/home/vagrant/packet-reader`. To compile the sample application, navigate to this folder and run `make`.
 
 The sample application can now be executed by running
 ```
