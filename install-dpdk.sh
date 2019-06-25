@@ -19,6 +19,7 @@ alias sudo="sudo -E"
 
 # Path to the DPDK directory
 export RTE_SDK=${HOME}/dpdk-stable-18.11.2
+export RTE_TARGET=x86_64-native-linux-gcc
 
 # Name of network interface provisioned for DPDK to bind
 export NET_IF_NAME=eth1
@@ -29,7 +30,7 @@ export NET_IF_NAME=eth1
 
 # Install dependencies
 sudo apt-get -q update
-sudo apt-get -q install -y build-essential linux-headers-`uname -r` libnuma-dev python
+sudo apt-get -q install -y build-essential linux-headers-`uname -r` libnuma-dev python pkg-config
 
 # Download DPDK version 18.11.2 (LTS) and extract archive
 wget -q https://fast.dpdk.org/rel/dpdk-18.11.2.tar.xz
@@ -42,7 +43,7 @@ make config T=x86_64-native-linuxapp-gcc
 make
 
 # Build sample packet capture application
-make -C ${HOME}/packet-reader
+#make -C ${HOME}/packet-reader
 
 ###########################
 # Temporary Configuration
@@ -73,6 +74,7 @@ echo "vm.nr_hugepages = 512" | sudo tee -a /etc/sysctl.conf > /dev/null
 
 # Add environment variable to system settings
 echo "RTE_SDK=${RTE_SDK}" | sudo tee -a /etc/environment > /dev/null
+echo "RTE_SDK=${RTE_TARGET}" | sudo tee -a /etc/environment > /dev/null
 
 # Binding the secondary NIC to DPDK is done by the Vagrant after "vagrant up" is executed
 # Notify the user that configuration has completed
