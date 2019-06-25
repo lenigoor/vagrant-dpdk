@@ -18,8 +18,8 @@ export https_proxy=$https_proxy
 alias sudo="sudo -E"
 
 # Path to the DPDK directory
-export RTE_SDK=${HOME}/dpdk-stable-18.11.2
-export RTE_TARGET=x86_64-native-linux-gcc
+export RTE_SDK=${HOME}/DPDK
+export RTE_TARGET=x86_64-native-linux-gcc  # used to be *-linuxapp-gcc
 
 # Name of network interface provisioned for DPDK to bind
 export NET_IF_NAME=eth1
@@ -33,13 +33,14 @@ sudo apt-get -q update
 sudo apt-get -q install -y build-essential linux-headers-`uname -r` libnuma-dev python pkg-config
 
 # Download DPDK version 18.11.2 (LTS) and extract archive
-wget -q https://fast.dpdk.org/rel/dpdk-18.11.2.tar.xz
-tar xf dpdk-18.11.2.tar.xz
-rm dpdk-18.11.2.tar.xz
+wget -q https://fast.dpdk.org/rel/dpdk-19.05.tar.xz # https://fast.dpdk.org/rel/dpdk-18.11.2.tar.xz
+mkdir -p DPDK
+tar xf dpdk-*.tar.xz --strip-components 1 -C ${RTE_SDK}
+rm dpdk-*.tar.xz
 
 # Build the DPDK library
 cd $RTE_SDK
-make config T=x86_64-native-linuxapp-gcc
+make config T=${RTE_TARGET}
 make
 
 # Build sample packet capture application
