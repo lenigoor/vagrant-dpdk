@@ -44,6 +44,7 @@ make config T=${RTE_TARGET}
 make
 
 # Build sample packet capture application
+export RTE_TARGET=build
 make -C ${HOME}/packet-reader
 
 ###########################
