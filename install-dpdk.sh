@@ -30,7 +30,8 @@ export NET_IF_NAME=eth1
 
 # Install dependencies
 sudo apt-get -q update
-sudo apt-get -q install -y build-essential linux-headers-`uname -r` libnuma-dev python pkg-config
+sudo apt-get -q install -y build-essential linux-headers-`uname -r` \
+                        libnuma-dev python pkg-config libelf-dev
 
 # Download DPDK version 18.11.2 (LTS) and extract archive
 wget -q https://fast.dpdk.org/rel/dpdk-19.05.tar.xz # https://fast.dpdk.org/rel/dpdk-18.11.2.tar.xz
