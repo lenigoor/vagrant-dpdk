@@ -74,7 +74,7 @@ echo "vm.nr_hugepages = 512" | sudo tee -a /etc/sysctl.conf > /dev/null
 
 # Add environment variable to system settings
 echo "RTE_SDK=${RTE_SDK}" | sudo tee -a /etc/environment > /dev/null
-echo "RTE_SDK=${RTE_TARGET}" | sudo tee -a /etc/environment > /dev/null
+echo "RTE_TARGET=${RTE_TARGET}" | sudo tee -a /etc/environment > /dev/null
 
 # Binding the secondary NIC to DPDK is done by the Vagrant after "vagrant up" is executed
 # Notify the user that configuration has completed
