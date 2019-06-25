@@ -1,4 +1,4 @@
-# DPDK 17.08 - Ubuntu 16.04 - Vagrant configuration
+# DPDK 18.11 - Ubuntu 16.04 - Vagrant configuration
 This project provides a Vagrant configuration for running DPDK 17.08.1 in an Ubuntu 16.04.3 LTS virtual machine. Also an additional test application is included for receiving packets using DPDK.
 
 ## Prerequisites

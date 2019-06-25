@@ -8,16 +8,20 @@
 #  * https://gist.github.com/ConradIrwin/9077440
 #  * http://dpdk.org/doc/quick-start
 #
-
+set -e
+set -x
 ###########################
 # Variables
 ###########################
+export http_proxy=$http_proxy
+export https_proxy=$https_proxy
+alias sudo="sudo -E"
 
 # Path to the DPDK directory
-export RTE_SDK=${HOME}/dpdk-stable-17.08.1
+export RTE_SDK=${HOME}/dpdk-stable-18.11.2
 
 # Name of network interface provisioned for DPDK to bind
-export NET_IF_NAME=enp0s8
+export NET_IF_NAME=eth1
 
 ###########################
 # Install DPDK
@@ -27,13 +31,13 @@ export NET_IF_NAME=enp0s8
 sudo apt-get -q update
 sudo apt-get -q install -y build-essential linux-headers-`uname -r` libnuma-dev python
 
-# Download DPDK version 17.08 and extract archive
-wget -q https://fast.dpdk.org/rel/dpdk-17.08.1.tar.xz
-tar xf dpdk-17.08.1.tar.xz
-rm dpdk-17.08.1.tar.xz
+# Download DPDK version 18.11.2 (LTS) and extract archive
+wget -q https://fast.dpdk.org/rel/dpdk-18.11.2.tar.xz
+tar xf dpdk-18.11.2.tar.xz
+rm dpdk-18.11.2.tar.xz
 
 # Build the DPDK library
-cd dpdk-stable-17.08.1
+cd $RTE_SDK
 make config T=x86_64-native-linuxapp-gcc
 make
 
