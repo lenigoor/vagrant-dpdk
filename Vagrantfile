@@ -28,9 +28,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	# VirtualBox-specific configuration
 	config.vm.provider "virtualbox" do |vb|
 		# Set machine name, memory and CPU limits
-		vb.name = "ubuntu-16.04-dpdk-18.11"
+		vb.name = "ubuntu-18.04-dpdk-18.11"
 		vb.memory = 4096
-		vb.cpus = 4
+		vb.cpus = 2
 
 		# Configure VirtualBox to enable passthrough of SSE 4.1 and SSE 4.2 instructions,
 		# according to this: https://www.virtualbox.org/manual/ch09.html#sse412passthrough

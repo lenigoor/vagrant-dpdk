@@ -19,7 +19,8 @@ alias sudo="sudo -E"
 
 # Path to the DPDK directory
 export RTE_SDK=${HOME}/DPDK
-export RTE_TARGET=x86_64-native-linux-gcc  # used to be *-linuxapp-gcc
+#export RTE_TARGET=x86_64-native-linux-gcc  # used to be *-linuxapp-gcc
+export RTE_TARGET=x86_64-native-linuxapp-gcc  # for 18.11
 
 # Name of network interface provisioned for DPDK to bind
 export NET_IF_NAME=eth1
@@ -34,7 +35,8 @@ sudo apt-get -q install -y build-essential linux-headers-`uname -r` \
                         libnuma-dev python pkg-config libelf-dev
 
 # Download DPDK version 18.11.2 (LTS) and extract archive
-wget -q https://fast.dpdk.org/rel/dpdk-19.05.tar.xz # https://fast.dpdk.org/rel/dpdk-18.11.2.tar.xz
+#wget -q https://fast.dpdk.org/rel/dpdk-19.05.tar.xz 
+wget -q https://fast.dpdk.org/rel/dpdk-18.11.2.tar.xz
 mkdir -p DPDK
 tar xf dpdk-*.tar.xz --strip-components 1 -C ${RTE_SDK}
 rm dpdk-*.tar.xz

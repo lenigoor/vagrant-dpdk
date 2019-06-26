@@ -1,22 +1,8 @@
-# DPDK 19 - Ubuntu 16.04 - Vagrant configuration
+# DPDK - Ubuntu 18.04 - Vagrant configuration
 This project provides a Vagrant configuration for running DPDK 19 in an Ubuntu 16.04 LTS virtual machine. Also an additional test application is included for receiving packets using DPDK.
 
 ## Prerequisites
 Tested using Vagrant 2.2.4 and VirtualBox 6.0.8.
-
-The version of Vagrant available in the Ubuntu package manager is not the most recent version. Visit https://www.vagrantup.com/downloads.html and download the appropriate file to get it.
-
-At the time of writing, Vagrant was installed by running
-```
-wget https://releases.hashicorp.com/vagrant/2.0.1/vagrant_2.0.1_x86_64.deb
-sudo dpkg -i vagrant_2.0.1_x86_64.deb
-vagrant plugin install vagrant-triggers
-```
-
-Now to install VirtualBox run
-```
-sudo apt install virtualbox virtualbox-ext-pack
-```
 
 ## Building the VM
 Using Vagrant makes building the virtual machine very easy!
