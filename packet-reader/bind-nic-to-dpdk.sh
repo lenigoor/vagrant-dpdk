@@ -1,6 +1,6 @@
 #!/bin/bash
 
-interface="enp0s8"
+interface="eth1"
 
 if [[ $EUID -ne 0 ]]; then
    echo "This script must be run as root"

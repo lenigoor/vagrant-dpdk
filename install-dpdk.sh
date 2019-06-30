@@ -8,16 +8,22 @@
 #  * https://gist.github.com/ConradIrwin/9077440
 #  * http://dpdk.org/doc/quick-start
 #
-
+set -e
+set -x
 ###########################
 # Variables
 ###########################
+export http_proxy=$http_proxy
+export https_proxy=$https_proxy
+alias sudo="sudo -E"
 
 # Path to the DPDK directory
-export RTE_SDK=${HOME}/dpdk-stable-17.08.1
+export RTE_SDK=${HOME}/DPDK
+#export RTE_TARGET=x86_64-native-linux-gcc  # used to be *-linuxapp-gcc
+export RTE_TARGET=x86_64-native-linuxapp-gcc  # for 18.11
 
 # Name of network interface provisioned for DPDK to bind
-export NET_IF_NAME=enp0s8
+export NET_IF_NAME=eth1
 
 ###########################
 # Install DPDK
@@ -25,19 +31,23 @@ export NET_IF_NAME=enp0s8
 
 # Install dependencies
 sudo apt-get -q update
-sudo apt-get -q install -y build-essential linux-headers-`uname -r` libnuma-dev python
+sudo apt-get -q install -y build-essential linux-headers-`uname -r` \
+                        libnuma-dev python pkg-config libelf-dev
 
-# Download DPDK version 17.08 and extract archive
-wget -q https://fast.dpdk.org/rel/dpdk-17.08.1.tar.xz
-tar xf dpdk-17.08.1.tar.xz
-rm dpdk-17.08.1.tar.xz
+# Download DPDK version 18.11.2 (LTS) and extract archive
+#wget -q https://fast.dpdk.org/rel/dpdk-19.05.tar.xz 
+wget -q https://fast.dpdk.org/rel/dpdk-18.11.2.tar.xz
+mkdir -p DPDK
+tar xf dpdk-*.tar.xz --strip-components 1 -C ${RTE_SDK}
+rm dpdk-*.tar.xz
 
 # Build the DPDK library
-cd dpdk-stable-17.08.1
-make config T=x86_64-native-linuxapp-gcc
+cd $RTE_SDK
+make config T=${RTE_TARGET}
 make
 
 # Build sample packet capture application
+export RTE_TARGET=build
 make -C ${HOME}/packet-reader
 
 ###########################
@@ -69,6 +79,7 @@ echo "vm.nr_hugepages = 512" | sudo tee -a /etc/sysctl.conf > /dev/null
 
 # Add environment variable to system settings
 echo "RTE_SDK=${RTE_SDK}" | sudo tee -a /etc/environment > /dev/null
+echo "RTE_TARGET=${RTE_TARGET}" | sudo tee -a /etc/environment > /dev/null
 
 # Binding the secondary NIC to DPDK is done by the Vagrant after "vagrant up" is executed
 # Notify the user that configuration has completed
