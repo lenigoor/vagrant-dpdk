@@ -15,7 +15,9 @@
 
 bool continue_polling = true;
 static const struct rte_eth_conf port_conf_default = {
-	.rxmode = { .max_rx_pkt_len = ETHER_MAX_LEN, },
+	.rxmode = {
+		.max_rx_pkt_len = ETHER_MAX_LEN,
+	},
 };
 
 /*
@@ -51,7 +53,7 @@ int port_init(uint8_t port, struct rte_mempool *mbuf_pool)
 	uint16_t nb_rxd = RX_RING_SIZE;
 	struct rte_eth_conf port_conf = port_conf_default;
 
-	if (port >= rte_eth_dev_count())
+	if (port >= rte_eth_dev_count_avail())
 		return -1;
 
 	retval = rte_eth_dev_configure(port, 1, 0, &port_conf);
@@ -68,7 +70,7 @@ int port_init(uint8_t port, struct rte_mempool *mbuf_pool)
 	if (retval < 0)
 		return retval;
 
-	retval  = rte_eth_dev_start(port);
+	retval = rte_eth_dev_start(port);
 	if (retval < 0)
 		return retval;
 
@@ -88,7 +90,7 @@ struct rte_mempool *initialize_dpdk(int argc, char **argv, uint8_t port)
 		rte_exit(EXIT_FAILURE, "Error with EAL initialization\n");
 
 	// Enumerate available ports
-	uint nb_ports = rte_eth_dev_count();
+	uint nb_ports = rte_eth_dev_count_avail();
 
 	if (nb_ports == 0)
 		rte_exit(EXIT_FAILURE, "No assigned network interfaces found\n  Run \"sudo ./bind-nic-to-dpdk.sh\" to assign the host-only adapter to DPDK\n");
@@ -112,7 +114,7 @@ struct rte_mempool *initialize_dpdk(int argc, char **argv, uint8_t port)
  */
 void process_packet(struct rte_mbuf *mbuf)
 {
-	u_char *p = rte_pktmbuf_mtod(mbuf, u_char*);
+	u_char *p = rte_pktmbuf_mtod(mbuf, u_char *);
 	uint16_t length = rte_pktmbuf_data_len(mbuf);
 	printf("---------------------------\n");
 
@@ -131,19 +133,19 @@ void process_packet(struct rte_mbuf *mbuf)
 	printf("IP dst = %u.%u.%u.%u\n", p[30], p[31], p[32], p[33]);
 
 	// Get IP payload protocol
-	switch(p[23])
+	switch (p[23])
 	{
-		case 0x01:
-			printf("ICMP payload\n");
-			break;
-		case 0x06:
-			printf("TCP payload\n");
-			break;
-		case 0x11:
-			printf("UDP payload\n");
-			break;
-		default:
-			printf("Unknown payload\n");
+	case 0x01:
+		printf("ICMP payload\n");
+		break;
+	case 0x06:
+		printf("TCP payload\n");
+		break;
+	case 0x11:
+		printf("UDP payload\n");
+		break;
+	default:
+		printf("Unknown payload\n");
 	}
 }
 
