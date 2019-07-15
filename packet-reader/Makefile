@@ -1,56 +1,15 @@
-# SPDX-License-Identifier: BSD-3-Clause
-# Copyright(c) 2010-2014 Intel Corporation
+LDFLAGS = -march=native -O2
+INCLUDE = -I ${RTE_SDK}/build/include -L ${RTE_SDK}/build/lib
+LIBS = -Wl,--whole-archive \
+		-lrte_pmd_e1000 -lrte_ethdev -lrte_eal \
+		-lrte_mbuf -lrte_mempool -lrte_mempool_ring \
+		-lrte_ring -lrte_hash -lrt -lm -ldl \
+		-lnuma -lpthread -lrte_pci -lrte_bus_pci \
+		-lrte_kvargs -lrte_cmdline -Wl,--no-whole-archive \
 
-# binary name
-APP = capture
-
-# all source are stored in SRCS-y
-SRCS-y := main.c
-
-# Build using pkg-config variables if possible
-$(shell pkg-config --exists libdpdk)
-ifeq ($(.SHELLSTATUS),0)
-
-all: shared
-.PHONY: shared static
-shared: build/$(APP)-shared
-        ln -sf $(APP)-shared build/$(APP)
-static: build/$(APP)-static
-        ln -sf $(APP)-static build/$(APP)
-
-PC_FILE := $(shell pkg-config --path libdpdk)
-CFLAGS += -O3 $(shell pkg-config --cflags libdpdk)
-LDFLAGS_SHARED = $(shell pkg-config --libs libdpdk)
-LDFLAGS_STATIC = -Wl,-Bstatic $(shell pkg-config --static --libs libdpdk)
-
-build/$(APP)-shared: $(SRCS-y) Makefile $(PC_FILE) | build
-        $(CC) $(CFLAGS) $(SRCS-y) -o $@ $(LDFLAGS) $(LDFLAGS_SHARED)
-
-build/$(APP)-static: $(SRCS-y) Makefile $(PC_FILE) | build
-        $(CC) $(CFLAGS) $(SRCS-y) -o $@ $(LDFLAGS) $(LDFLAGS_STATIC)
-
-build:
-        @mkdir -p $@
+capture: main.c
+		gcc $^ -o $@ $(LDFLAGS) $(INCLUDE) $(LIBS)
 
 .PHONY: clean
 clean:
-        rm -f build/$(APP) build/$(APP)-static build/$(APP)-shared
-        rmdir --ignore-fail-on-non-empty build
-
-else
-
-ifeq ($(RTE_SDK),)
-$(error "Please define RTE_SDK environment variable")
-endif
-
-# Default target, detect a build directory, by looking for a path with a .config
-RTE_TARGET ?= $(notdir $(abspath $(dir $(firstword $(wildcard $(RTE_SDK)/*/.config)))))
-
-include $(RTE_SDK)/mk/rte.vars.mk
-
-CFLAGS += -O3
-CFLAGS += $(WERROR_FLAGS)
-
-include $(RTE_SDK)/mk/rte.extapp.mk
-
-endif
+		rm -f capture
