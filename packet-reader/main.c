@@ -23,7 +23,7 @@ static const struct rte_eth_conf port_conf_default = {
 /*
  * Validate whether the current user has root privileges.
  */
-bool is_user_root()
+static bool is_user_root(void)
 {
 	if (getuid())
 	{
@@ -37,16 +37,16 @@ bool is_user_root()
 /*
  * Signal handler that stops the packet capture loop.
  */
-void stop_polling()
+static void stop_polling(int ret)
 {
-	printf("\rInterrupt received, stopping live capture\n");
+	printf("\rInterrupt received, stopping live capture  (return code: %d\n", ret);
 	continue_polling = false;
 }
 
 /* 
  * Initialize the receive descriptors for the given DPDK port.
  */
-int port_init(uint8_t port, struct rte_mempool *mbuf_pool)
+static int port_init(uint8_t port, struct rte_mempool *mbuf_pool)
 {
 	int retval;
 	uint16_t nb_txd = 0;
@@ -81,30 +81,36 @@ int port_init(uint8_t port, struct rte_mempool *mbuf_pool)
 /*
  * Function to initialize the DPDK framework.
  */
-struct rte_mempool *initialize_dpdk(int argc, char **argv, uint8_t port)
+static struct rte_mempool *initialize_dpdk(int argc, char **argv, uint8_t port)
 {
 	// Initialize abstraction layer
 	int ret = rte_eal_init(argc, argv);
-
 	if (ret < 0)
+	{
 		rte_exit(EXIT_FAILURE, "Error with EAL initialization\n");
+	}
 
 	// Enumerate available ports
-	uint nb_ports = rte_eth_dev_count_avail();
-
+	unsigned nb_ports = rte_eth_dev_count_avail();
 	if (nb_ports == 0)
-		rte_exit(EXIT_FAILURE, "No assigned network interfaces found\n  Run \"sudo ./bind-nic-to-dpdk.sh\" to assign the host-only adapter to DPDK\n");
+	{
+		rte_exit(EXIT_FAILURE, "ERR: No assigned network interfaces found\n  Run \"sudo ./bind-nic-to-dpdk.sh\" to assign the host-only adapter to DPDK\n");
+	}
 
 	// Allocate memory pool for packets
 	struct rte_mempool *mbuf_pool;
 	mbuf_pool = rte_pktmbuf_pool_create("MBUF_POOL", NUM_MBUFS * nb_ports, MBUF_CACHE_SIZE, 0, RTE_MBUF_DEFAULT_BUF_SIZE, rte_socket_id());
 
 	if (mbuf_pool == NULL)
+	{
 		rte_exit(EXIT_FAILURE, "Cannot create mbuf pool\n");
+	}
 
 	// Initialize NIC receive port
 	if (port_init(port, mbuf_pool) != 0)
+	{
 		rte_exit(EXIT_FAILURE, "Cannot init port %u\n", port);
+	}
 
 	return mbuf_pool;
 }
@@ -112,7 +118,7 @@ struct rte_mempool *initialize_dpdk(int argc, char **argv, uint8_t port)
 /*
  * Display some basic information about the packet, like MAC and IP addresses.
  */
-void process_packet(struct rte_mbuf *mbuf)
+static void process_packet(struct rte_mbuf *mbuf)
 {
 	u_char *p = rte_pktmbuf_mtod(mbuf, u_char *);
 	uint16_t length = rte_pktmbuf_data_len(mbuf);
@@ -164,6 +170,10 @@ int main(int argc, char **argv)
 	// Initialize DPDK
 	uint8_t port = 0;
 	struct rte_mempool *mbuf_pool = initialize_dpdk(argc, argv, port);
+	if (mbuf_pool == NULL)
+	{
+		exit(1);
+	}
 	struct rte_mbuf *bufs[BURST_SIZE];
 
 	// Main packet capture loop
